@@ -31,24 +31,23 @@ Vagrant.configure("2") do |config|
         vb.memory = machine[:ram]
         vb.cpus = machine[:cpu]
       end
+
+      node.vm.provision "shell", inline: case machine[:hostname]
+      when "iaschneiS"
+        <<-SHELL
+          apt update && apt upgrade -y
+          apt install curl -y
+          ufw disable
+          curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="server" sh -s --token 12345
+        SHELL
+      when "iaschneiSW"
+        <<-SHELL
+          apt update && apt upgrade -y
+          apt install curl -y
+          ufw disable
+          curl -sfL https://get.k3s.io | K3S_URL="https://192.168.56.110:6443" K3S_TOKEN="12345" INSTALL_K3S_EXEC="agent" sh -s
+        SHELL
+      end
     end
-  end
-
-  config.vm.define "iaschneiS" do |iaschneiS|
-    iaschneiS.vm.provision "shell", inline: <<-SHELL
-      apt update && apt upgrade -y
-      apt install curl -y
-      ufw disable
-      curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="server" sh -s --token 12345
-    SHELL
-  end
-
-  config.vm.define "iaschneiSW" do |iaschneiSW|
-    iaschneiSW.vm.provision "shell", inline: <<-SHELL
-      apt update && apt upgrade -y
-      apt install curl -y
-      ufw disable
-      curl -sfL https://get.k3s.io | K3S_URL="https://192.168.56.110:6443" K3S_TOKEN="12345" INSTALL_K3S_EXEC="agent" sh -s
-    SHELL
   end
 end
