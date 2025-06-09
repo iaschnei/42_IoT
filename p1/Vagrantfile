@@ -1,64 +1,54 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-
-SERVICES =  {
-  'iaschneiS' => {
-  ip: '192.168.56.110',
-  ports: { 8080 => 8080 }
+machines=[
+  {
+    :hostname => "iaschneiS",
+    :ip => "192.168.56.110",
+    :box => "debian/bookworm64",
+    :ram => 512,
+    :cpu => 1
   },
-  'iaschneiSW' => {
-    ip: '192.168.56.111',
-    ports: { 8181 => 8181 }
+  {
+    :hostname => "iaschneiSW",
+    :ip => "192.168.56.111",
+    :box => "debian/bookworm64",
+    :ram => 512,
+    :cpu => 1
   }
-}
+]
 
 # The argument '2' corresponds to the config version. 2 is the most recent version. 
 Vagrant.configure("2") do |config|
-  
-  config.vm.box = "generic/debian12"
-  
-  config.vm.provider :libvirt do |libvirt|
-    libvirt.machine_type = "q35"
+
+  machines.each do |machine|
+    config.vm.define machine[:hostname] do |node|
+      node.vm.box = machine[:box]
+      node.vm.hostname = machine[:hostname]
+      node.vm.network "private_network", ip: machine[:ip]
+      node.vm.provider "virtualbox" do |vb|
+        vb.gui = false
+        vb.memory = machine[:ram]
+        vb.cpus = machine[:cpu]
+      end
+    end
   end
 
   config.vm.define "iaschneiS" do |iaschneiS|
-    iaschneiS.vm.hostname = "iaschneiS"
-    iaschneiS.vm.network "private_network", ip: SERVICES['iaschneiS'][:ip]
-    iaschneiS.vm.network "forwarded_port", guest: 8080, host: 8080
-
-    iaschneiS.vm.provider :libvirt do |libvirt|
-      libvirt.memory = 512
-      libvirt.cpus = 1
-    end
-
-    iaschneiS.vm.provision "shell", name: "start-iaschneiS", inline: <<-SHELL
+    iaschneiS.vm.provision "shell", inline: <<-SHELL
       apt update && apt upgrade -y
-      apt install curl qemu-guest-agent -y
-      systemctl start qemu-guest-agent
-      systemctl enable aemu-guest-agent
+      apt install curl -y
       ufw disable
       curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="server" sh -s --token 12345
     SHELL
   end
 
   config.vm.define "iaschneiSW" do |iaschneiSW|
-    iaschneiSW.vm.hostname = "iaschneiSW"
-    iaschneiSW.vm.network "private_network", ip: SERVICES['iaschneiSW'][:ip]
-    iaschneiSW.vm.network "forwarded_port", guest: 8181, host: 8181
-
-    iaschneiSW.vm.provider :libvirt do |libvirt|
-      libvirt.memory = 512
-      libvirt.cpus = 1
-    end
-
-    iaschneiSW.vm.provision "shell", name: "start-iaschneiSW", inline: <<-SHELL
+    iaschneiSW.vm.provision "shell", inline: <<-SHELL
       apt update && apt upgrade -y
-      apt install curl qemu-guest-agent -y
-      systemctl start qemu-guest-agent
-      systemctl enable aemu-guest-agent
+      apt install curl -y
       ufw disable
-      curl -sfL https://get.k3s.io | K3S_URL="https://192.168.56.110:6443" K3S_TOKEN="12345" INSTALL_K3S_EXEC="agent" sh -
+      curl -sfL https://get.k3s.io | K3S_URL="https://192.168.56.110:6443" K3S_TOKEN="12345" INSTALL_K3S_EXEC="agent" sh -s
     SHELL
   end
 end
