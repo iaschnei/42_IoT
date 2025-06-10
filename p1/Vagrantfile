@@ -36,7 +36,8 @@ Vagrant.configure("2") do |config|
      when "iaschneiS"
         <<-SHELL
           sudo apt-get update
-          sudo apt-get install -y curl apt-transport-https ca-certificates gnupg
+          sudo apt-get install -y curl apt-transport-https ca-certificates gnupg ufw
+          sudo ufw disable
           curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo gpg --dearmor -o /usr/share/keyrings/cloud.google.gpg
           echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | sudo tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
           sudo apt-get update
@@ -48,7 +49,8 @@ Vagrant.configure("2") do |config|
       when "iaschneiSW"
         <<-SHELL
           sudo apt-get update
-          sudo apt-get install -y curl apt-transport-https ca-certificates gnupg
+          sudo apt-get install -y curl apt-transport-https ca-certificates gnupg ufw
+          sudo ufw disable
           curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo gpg --dearmor -o /usr/share/keyrings/cloud.google.gpg
           echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | sudo tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
           sudo apt-get update
