@@ -38,17 +38,39 @@ Vagrant.configure("2") do |config|
           sudo apt-get update
           sudo apt-get install -y curl apt-transport-https ca-certificates gnupg ufw
           sudo ufw disable
+
+          #Install kubectl through google-cli
           curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo gpg --dearmor -o /usr/share/keyrings/cloud.google.gpg
           echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | sudo tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
           sudo apt-get update
           sudo apt-get install -y google-cloud-cli
           sudo apt-get update
           sudo apt-get install -y kubectl
+
+          #Install k3s in server mode
           curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="server --token 12345" sh -s
+
+          # Wait to make sure k3s is ready
+          sleep 10
+          
+          # Modify the config of cubectl with our ip
+          mkdir -p /home/vagrant/.kube
+          sudo cp /etc/rancher/k3s/k3s.yaml /home/vagrant/.kube/config
+          sudo chown vagrant:vagrant /home/vagrant/.kube/config
+          sudo chmod 600 /home/vagrant/.kube/config
+          sed -i 's/127.0.0.1/192.168.56.110/g' home/vagrant/.kube/config
+
+          # Add the config as env variable
+          echo "export KUBECONFIG=/home/vagrant/.kube/config" >> /home/vagrant/.bashrc
+
+          # Make kubectl work without sudo
+          sudo chmod 644 /etc/rancher/k3s/k3s.yaml
         SHELL
       when "iaschneiSW"
         <<-SHELL
           sudo apt-get update
+
+          # Install kubectl through google-cli
           sudo apt-get install -y curl apt-transport-https ca-certificates gnupg ufw
           sudo ufw disable
           curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo gpg --dearmor -o /usr/share/keyrings/cloud.google.gpg
@@ -57,7 +79,20 @@ Vagrant.configure("2") do |config|
           sudo apt-get install -y google-cloud-cli
           sudo apt-get update
           sudo apt-get install -y kubectl
+
+          # Install k3s in agent (worker) mode
           curl -sfL https://get.k3s.io | K3S_URL="https://192.168.56.110:6443" K3S_TOKEN="12345" INSTALL_K3S_EXEC="agent" sh -s
+
+          # Wait for k3s to be ready
+          sleep 10
+
+          # Copy the config from server (master)
+          scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null vagrant@192.168.56.110:/home/vagrant/.kube/config /home/vagrant/.kube/config
+          sudo chown vagrant:vagrant /home/vagrant/.kube/config
+          sudo chmod 600 /home/vagrant/.kube/config
+
+          # Add the config to the env
+          echo "export KUBECONFIG=/home/vagrant/.kube/config" >> /home/vagrant/.bashrc
         SHELL
       end
     end
