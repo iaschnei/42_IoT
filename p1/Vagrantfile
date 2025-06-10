@@ -36,21 +36,25 @@ Vagrant.configure("2") do |config|
      when "iaschneiS"
         <<-SHELL
           sudo apt-get update
-          sudo apt-get install -y curl apt-transport-https
-          curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
-          echo "deb https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee -a /etc/apt/sources.list.d/kubernetes.list
+          sudo apt-get install -y curl apt-transport-https ca-certificates gnupg
+          curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo gpg --dearmor -o /usr/share/keyrings/cloud.google.gpg
+          echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | sudo tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
           sudo apt-get update
-          sudo apt-get install -y kubelet kubeadm kubectl
+          sudo apt-get install -y google-cloud-cli
+          sudo apt-get update
+          sudo apt-get install -y kubectl
           curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="server --token 12345" sh -s
         SHELL
       when "iaschneiSW"
         <<-SHELL
           sudo apt-get update
-          sudo apt-get install -y curl apt-transport-https
-          curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
-          echo "deb https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee -a /etc/apt/sources.list.d/kubernetes.list
+          sudo apt-get install -y curl apt-transport-https ca-certificates gnupg
+          curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo gpg --dearmor -o /usr/share/keyrings/cloud.google.gpg
+          echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | sudo tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
           sudo apt-get update
-          sudo apt-get install -y kubelet kubeadm kubectl
+          sudo apt-get install -y google-cloud-cli
+          sudo apt-get update
+          sudo apt-get install -y kubectl
           curl -sfL https://get.k3s.io | K3S_URL="https://192.168.56.110:6443" K3S_TOKEN="12345" INSTALL_K3S_EXEC="agent" sh -s
         SHELL
       end
