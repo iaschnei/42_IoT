@@ -7,14 +7,14 @@ machines=[
     :ip => "192.168.56.110",
     :box => "generic/alma9",
     :ram => 1024,
-    :cpu => 1
+    :cpu => 2
   },
   {
     :hostname => "iaschneiSW",
     :ip => "192.168.56.111",
     :box => "generic/alma9",
     :ram => 1024,
-    :cpu => 1
+    :cpu => 2
   }
 ]
 
@@ -33,12 +33,12 @@ Vagrant.configure("2") do |config|
       end
 
       node.vm.provision "shell", inline: case machine[:hostname]
-      when "iaschneiS"
+     when "iaschneiS"
         <<-SHELL
           dnf update -y
           dnf install -y curl
           systemctl disable --now firewalld
-          curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="server" sh -s --token 12345
+          curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="server --token 12345" sh -s
         SHELL
       when "iaschneiSW"
         <<-SHELL
