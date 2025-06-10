@@ -17,5 +17,6 @@ curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="server --token 12345 --node-ip=
 sleep 15
 
 #Setup config for kubectl
-sudo chmod 755 /etc/rancher/k3s/k3s.yaml
-export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
+sudo chmod 644 /etc/rancher/k3s/k3s.yaml
+echo "export KUBECONFIG=/etc/rancher/k3s/k3s.yaml" >> /home/vagrant/.bashrc
+echo "export KUBECONFIG=/etc/rancher/k3s/k3s.yaml" >> /home/vagrant/.profile
