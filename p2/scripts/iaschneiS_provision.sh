@@ -20,8 +20,18 @@ sudo systemctl start docker
 sudo systemctl enable docker
 sudo usermod -aG docker vagrant
 
-#Install k3s in server mode
-curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="server --token 12345 --node-ip=192.168.56.110 --flannel-iface=eth1 --docker" sh -s
+#Install k3s in server mode (need multiple try, can randomly fail)
+for i in {1..3}; do
+  if curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="server --token 12345 --node-ip=192.168.56.110 --flannel-iface=eth1 --docker" sh -s; then
+	break
+  else
+    if [ $i -eq 3 ]; then
+	echo "Failed to install k3s after 3 attempts"
+	exit 1
+    fi
+    sleep 10
+  fi
+done
 
 sleep 15
 
