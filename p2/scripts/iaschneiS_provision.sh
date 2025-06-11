@@ -33,8 +33,8 @@ sleep 10
 
 #Build Docker images for our apps
 docker build -t app1:latest ./confs/app1/
-docker build -t app1:latest ./confs/app2/
-docker build -t app1:latest ./confs/app3/
+docker build -t app2:latest ./confs/app2/
+docker build -t app3:latest ./confs/app3/
 
 #Apply deployments:
 kubectl apply -f ./confs/app1/deployment.yaml
