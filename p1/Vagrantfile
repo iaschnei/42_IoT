@@ -8,7 +8,7 @@ machines=[
     :box => "generic/debian12",
     :ram => 1024,
     :cpu => 2,
-    :script => "./confs/iaschneiS_provision.sh"
+    :script => "./scripts/iaschneiS_provision.sh"
   },
   {
     :hostname => "iaschneiSW",
@@ -16,7 +16,7 @@ machines=[
     :box => "generic/debian12",
     :ram => 1024,
     :cpu => 2,
-    :script => "./confs/iaschneiSW_provision.sh"
+    :script => "./scripts/iaschneiSW_provision.sh"
   }
 ]
 
