@@ -28,3 +28,22 @@ echo "export KUBECONFIG=/etc/rancher/k3s/k3s.yaml" >> /home/vagrant/.bashrc
 echo "export KUBECONFIG=/etc/rancher/k3s/k3s.yaml" >> /home/vagrant/.profile
 
 kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.12.3/deploy/static/provider/cloud/deploy.yaml
+
+sleep 10
+
+#Build Docker images for our apps
+docker build -t app1:latest ./confs/app1/
+docker build -t app1:latest ./confs/app2/
+docker build -t app1:latest ./confs/app3/
+
+#Apply deployments:
+kubectl apply -f ./confs/app1/deployment.yaml
+kubectl apply -f ./confs/app2/deployment.yaml
+kubectl apply -f ./confs/app3/deployment.yaml
+
+#Apply services:
+kubectl apply -f ./confs/app1/service.yaml
+kubectl apply -f ./confs/app2/service.yaml
+kubectl apply -f ./confs/app3/service.yaml
+
+kubectl apply -f ./confs/ingress.yaml
