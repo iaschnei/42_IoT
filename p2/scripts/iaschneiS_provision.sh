@@ -4,11 +4,11 @@ sudo apt-get install -y curl apt-transport-https ca-certificates gnupg ufw
 sudo ufw disable
 
 #Sometimes the google key retrieval can fail, make sure there are no duplicates
-sudo rm -f /usr/share/keyrings/clood.google.gpg
+sudo rm -f /usr/share/keyrings/cloud.google.gpg
 
 #Install kubectl through google-cli
 curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo gpg --dearmor -o /usr/share/keyrings/cloud.google.gpg
-echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | sudo tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
+echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | sudo tee /etc/apt/sources.list.d/google-cloud-sdk.list
 sudo apt-get update
 sudo apt-get install -y google-cloud-cli
 sudo apt-get update
@@ -29,11 +29,10 @@ sleep 15
 sudo chmod 644 /etc/rancher/k3s/k3s.yaml
 echo "export KUBECONFIG=/etc/rancher/k3s/k3s.yaml" >> /home/vagrant/.bashrc
 echo "export KUBECONFIG=/etc/rancher/k3s/k3s.yaml" >> /home/vagrant/.profile
+export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
 
 #Make sure k3s is ready
-until kubectl get nodes; do
-	sleep 5
-done
+timeout 300 bash -c 'until kubectl get nodes | grep -q "Ready"; do echo "Waiting for k3s to be ready..."; sleep 5; done'
 
 
 kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.12.3/deploy/static/provider/cloud/deploy.yaml
