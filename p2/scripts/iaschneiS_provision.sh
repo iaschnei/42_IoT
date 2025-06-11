@@ -11,8 +11,14 @@ sudo apt-get install -y google-cloud-cli
 sudo apt-get update
 sudo apt-get install -y kubectl
 
+#Install docker
+sudo apt-get install -y docker.io
+sudo systemctl start docker
+sudo systemctl enable docker
+sudo usermod -aG docker vagrant
+
 #Install k3s in server mode
-curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="server --token 12345 --node-ip=192.168.56.110 --flannel-iface=eth1" sh -s
+curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="server --token 12345 --node-ip=192.168.56.110 --flannel-iface=eth1 --docker" sh -s
 
 sleep 15
 
