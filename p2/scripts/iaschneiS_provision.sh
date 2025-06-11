@@ -44,8 +44,13 @@ export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
 #Make sure k3s is ready
 timeout 300 bash -c 'until kubectl get nodes | grep -q "Ready"; do echo "Waiting for k3s to be ready..."; sleep 5; done'
 
-
 kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.12.3/deploy/static/provider/cloud/deploy.yaml
+
+#Wait for nginx controller to be ready
+sleep 10
+kubectl wait --namespace ingress-nginx --for=condition=ready pod --selector=app.kubernetes.io/component=controller --timeout=180s
+kubectl wait --namespace ingress-nginx --for=condition=ready pod --selector=app.kubernetes.io/component=admission-webhook --timeout=180s
+
 
 #Build Docker images for our apps
 docker build -t app1:latest /vagrant/confs/app1/
